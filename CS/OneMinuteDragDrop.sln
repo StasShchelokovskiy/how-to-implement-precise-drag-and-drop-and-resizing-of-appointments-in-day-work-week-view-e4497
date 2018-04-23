@@ -1,0 +1,19 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OneMinuteDragDrop", "OneMinuteDragDrop\OneMinuteDragDrop.csproj", "{5005E3E8-E79C-4A4A-A214-4F63A53000CC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5005E3E8-E79C-4A4A-A214-4F63A53000CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5005E3E8-E79C-4A4A-A214-4F63A53000CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5005E3E8-E79C-4A4A-A214-4F63A53000CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5005E3E8-E79C-4A4A-A214-4F63A53000CC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
