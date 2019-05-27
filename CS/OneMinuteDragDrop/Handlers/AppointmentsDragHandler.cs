@@ -1,8 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 using DevExpress.XtraScheduler;
+using DevExpress.XtraScheduler.Drawing;
 using OneMinuteDragDrop.Handlers;
 
 namespace OneMinuteDragDrop {
@@ -10,8 +13,8 @@ namespace OneMinuteDragDrop {
 
         AppointmentDragInfo dragInfo;
 
-        protected internal TimeSpan CalcCurrentTimeStamp(TimeInterval viewInfoInterval) {
-            return GetCurrentTimeStamp(viewInfoInterval);
+        protected internal TimeSpan CurrentTimeStamp {
+            get { return GetCurrentTimeStamp(); }
         }
         protected internal DateTime CurrentDate {
             get { return TimeCellViewInfo.Interval.Start.Date; }
@@ -32,20 +35,15 @@ namespace OneMinuteDragDrop {
         }
 
         protected virtual void MouseDownHandler(object sender, MouseEventArgs e) {
-            var aptViewInfo = AppointmentViewInfo;
-            if (aptViewInfo != null) {
-                var timePosition = CalcCurrentTimeStamp(aptViewInfo.Interval);
+            if (AppointmentViewInfo != null) {
                 dragInfo = new AppointmentDragInfo() {
-                    Appointment = aptViewInfo.Appointment,
-                    TimeAtCursor = timePosition,
-                    ViewInfoInterval = aptViewInfo.Interval
+                    Appointment = AppointmentViewInfo.Appointment,
+                    TimeAtCursor = CurrentTimeStamp
                 };
             }
         }
 
-        Appointment sourceAppointment;
         protected virtual void AppointmentDragHandler(object sender, AppointmentDragEventArgs e) {
-            sourceAppointment = e.SourceAppointment;
             AdjustSourceAptStart(e);
             OnDragDrop(e);
         }
@@ -55,29 +53,18 @@ namespace OneMinuteDragDrop {
         }
 
         void OnDragDrop(AppointmentDragEventArgs e) {
-            var currentTimeStamp = GetCurrentTimeStamp(this.dragInfo.ViewInfoInterval);
-            DateTime temp = e.SourceAppointment.Start + currentTimeStamp - dragInfo.TimeAtCursor;
-            e.EditedAppointment.Start = temp;
-            e.Allow = true;
+            e.EditedAppointment.Start = e.SourceAppointment.Start + CurrentTimeStamp - dragInfo.TimeAtCursor;
         }
 
         void AdjustSourceAptStart(AppointmentDragEventArgs e) {
-            if (e.SourceAppointment.Start.Day != CurrentDate.Day && control.ActiveViewType != SchedulerViewType.Gantt) {
-                e.SourceAppointment.Start = e.SourceAppointment.End < e.EditedAppointment.End ? e.SourceAppointment.Start.AddDays(1) : e.SourceAppointment.Start.AddDays(-1);
+            if (e.SourceAppointment.Start.Day != CurrentDate.Day) {
+                e.SourceAppointment.Start = e.SourceAppointment.End < e.EditedAppointment.End ?
+                    e.SourceAppointment.Start.AddDays(1) : e.SourceAppointment.Start.AddDays(-1);
             }
         }
 
-        private TimeSpan GetCurrentTimeStamp(TimeInterval viewInfoInterval) {
-            TimeSpan timeStamp = TimeCellViewInfo.Interval.Start.TimeOfDay + (control.ActiveView.Type == SchedulerViewType.Gantt ? GetCellTimeShiftHorizontally() : GetCellTimeShiftVertically());
-            return control.ActiveView.Type == SchedulerViewType.Gantt ? GetDaysTimeSpan(TimeCellViewInfo.Interval, viewInfoInterval) + timeStamp : timeStamp;
-        }
-
-        TimeSpan GetDaysTimeSpan(TimeInterval interval, TimeInterval appointmentViewInfoInterval) {
-            if (sourceAppointment != null)
-                return TimeSpan.FromDays(interval.Start.Day - appointmentViewInfoInterval.Start.Day);
-            else
-                return TimeSpan.FromDays(interval.Start.Day - interval.End.Day);
-
+        private TimeSpan GetCurrentTimeStamp() {
+            return TimeCellViewInfo.Interval.Start.TimeOfDay + GetCellTimeShift();
         }
     }
 
@@ -86,6 +73,5 @@ namespace OneMinuteDragDrop {
 
         public Appointment Appointment { get; set; }
         public TimeSpan TimeAtCursor { get; set; }
-        public TimeInterval ViewInfoInterval { get; set; }
     }
 }
